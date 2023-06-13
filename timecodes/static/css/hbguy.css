@@ -1,0 +1,277 @@
+body{
+background: linear-gradient(106deg, rgba(2,0,36,1) 0%, rgba(69,9,121,1) 33%, rgba(121,35,9,1) 100%, rgba(0,212,255,1) 100%);
+}
+
+.bg-light {
+    background-color: #333 !important;
+    color: #eee;
+}
+
+#addRow{
+	background-color: transparent;
+	border: none;
+}
+#addRow:hover {
+	cursor: pointer;
+	color: #aaa;
+}
+#copy{
+	background-color: transparent;
+	border: none;
+}
+#copy:hover {
+	cursor: pointer;
+	color: #aaa;
+}
+#save{
+	background-color: transparent;
+	border: none;
+}
+#save:hover {
+	cursor: pointer;
+	color: #aaa;
+}
+.delete{
+	background-color: transparent;
+	border: none;
+}
+.delete:hover {
+	cursor: pointer;
+	color: #aaa;
+}
+#lesina{
+	background-color: transparent;
+	border: none;
+}
+#lesina:hover {
+	cursor: pointer;
+	color: #aaa;
+}
+
+.buttons {
+	margin-left: 50%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	transform: translate(-50%, 0);
+	display: flex;
+	justify-content: center;
+}
+
+main {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	height: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+td {
+  padding: 10px; /* добавляем отступы для улучшения читабельности */
+  display: flex;
+  justify-content: center;
+  width: 80%;
+}
+
+td input, td textarea {
+  border: 1px solid black; /* убираем границы у элементов внутри ячеек */
+  font-size: 1.3rem;
+  font-family: sans-serif;
+}
+td input{
+	width:40%;
+	background-color: transparent;
+	border: none;
+	border-bottom: 2px solid #1F4D40;
+	outline: none;
+	text-align: center;
+	align-self: flex-start;
+}
+
+td textarea { 
+	resize: none;
+  overflow: hidden;
+  background-color: transparent;
+	border: none;
+	border-bottom: 2px solid #1F4D40;
+	outline: none;
+	text-align: center;
+	align-self: flex-start;
+	width: 100%;
+}
+
+tr {
+	display: flex;
+	border: 1px solid #000;
+	border-radius: 15px;
+	margin: 0.1rem;
+
+/*	background-color: #4F8D90;*/
+	    width: 80vw;
+	justify-content: space-between;
+	align-items: center;
+	background: #B4AC01;
+}
+
+#popups {
+  	position: absolute;
+  	z-index: 1;
+  	background-color: #eee;
+    color: #111;
+  	border-radius: 25px;
+		padding: 10px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    left: 102%;
+    height: 50%;
+    width: 30%;
+    overflow-y: auto;
+    font-family: sans-serif;
+}
+
+#popups li {
+    list-style-type: none;
+    margin: 40px 0px;
+    cursor: pointer;
+}
+
+#popups li:hover {
+  background-color: #B7D560;
+}
+
+
+.delete {
+
+}
+
+
+.dropbtn {
+  color: #eee;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  border-left: 2px solid #3498DB;
+  cursor: pointer;
+  background-color: #333;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #222;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {
+	display:block;
+}
+
+.pic {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+.pic img {
+	width: 100%;
+	border-radius: 50px;
+	border: 2px solid #000;
+}
+
+.pics {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+.pics img {
+	width: 100%;
+	border-radius: 50px;
+	border: 2px solid #000;
+}
+
+
+
+.hidden {
+	display: none;
+}
+
+
+
+
+.col{
+	display: flex;
+	justify-content: center;
+}
+
+.card-img-top {
+	height: 25vh;
+	width: 100%;
+}
+
+.card-title {
+	color: #aaa;
+}
+
+.card {
+	width: 80%;
+  height: 100%;
+	border: 2px solid #000;
+	background-color: #111 !important;
+}
+
+.card a:link {
+	text-decoration: none;
+}
+
+.navbar>.container-fluid{
+	justify-content: space-evenly;
+}
+
+.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y) * -1);
+    margin-right: 0 !important;
+    margin-left: calc(var(--bs-gutter-x) * -.5);
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+	font-family: Oswald;
+}
+
+h2{
+	justify-content: left !important;
+  display: flex !important;
+  color: #eee;
+  margin-left: 3.2% !important;
+}

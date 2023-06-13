@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/hbguy.css' %}">
+</head>
+<body>
+  <main>
+    <div class="container" id="container">
+      <table>
+        <thead>
+        <tbody id="fields">
+          {% if length == 0 %}
+          <tr>
+            <td><input type="tel" id="timecode0" name="timecode0" maxlength="8" value="00:00"></td>
+            <td><textarea id="text0" name="text0" rows="1" oninput="autoGrowTextarea(this)"></textarea></td>
+            <td><button class="delete"><img src="{% static 'delete.png' %}" width="50px" height="50px"></button></td>
+          </tr>
+          {% else %}
+            {% for i, j in data %}
+            <tr>
+              <td><input type="tel" id="timecode{{ forloop.counter0 }}" name="timestamps{{ forloop.counter0 }}" maxlength="8" value="{{ i }}"></td>
+              <td><textarea id="text{{ forloop.counter0 }}" name="texts{{ forloop.counter0 }}" rows="1" oninput="autoGrowTextarea(this)">{{ j }}</textarea></td>
+              <td><button class="delete"><img src="{% static 'delete.png' %}" width="50px" height="50px"></button></td>
+            </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+      <div class="buttons">
+        <button id="addRow"><img src="{% static 'plus.png' %}" width="50px" height="50px"></button>
+        <button id="copy"><img src="{% static 'copy.png' %}" width="50px" height="50px"></button>
+        <form action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" id="timestamps-field" name="timestamps_field">
+          <input type="hidden" id="texts-field" name="texts_field">
+        </form>
+        <button id="save"><img src="{% static 'save.png' %}" width="50px" height="50px"></button>
+        <button id="lesina"><img src="{% static 'lesina.png' %}" width="50px" height="50px"></button>
+      </div>
+      <div class="pics hidden"><img src="{% static 'rzvrt.gif' %}"></div>
+      <div class="pic hidden"><img src="{% static 'veralesina.gif' %}"></div>
+    </div>
+  </main>
+	<script>
+	  const container = document.getElementById("fields");
+	  const addRowButton = document.getElementById("addRow");
+	  const textarea = document.getElementById("text0");
+	  let rowNum = 1; // номер первой новой строки
+
+	addRowButton.addEventListener("click", function() {
+	    	addNewRow();
+	  });
+	document.querySelector("#save").addEventListener("click", e => {
+	  		document.querySelector(".pics").classList.toggle("hidden");
+	  		saveForm(e);
+	  });
+    document.querySelector("#lesina").addEventListener("click", e => {
+			document.querySelector(".pic").classList.toggle("hidden");
+	  });
+	document.querySelectorAll("input")[document.querySelectorAll("textarea").length-1].focus();
+	  document.querySelectorAll("textarea").forEach(i => {
+	  		i.style.height = "5px";
+	    	i.style.height = (i.scrollHeight) + "px";
+	  });
+	document.querySelectorAll(".delete").forEach(i => {
+	  		i.addEventListener("click", deleteRow)
+	  		i.addEventListener("click", saveForm)
+	  });
+	for (var i = 1; i < document.querySelectorAll("textarea").length; i++) {
+	  		addSuggestions(document.querySelectorAll("textarea")[i]);
+	  }
+	document.querySelectorAll("input").forEach(i => {
+	    	//i.addEventListener("change", saveForm);
+	    	i.addEventListener("keydown", e => {
+	    		if(e.currentTarget.value.length == 8 || e.key === "Enter" || e.key === "Tab") {
+			  		e.currentTarget.value += "";
+			    	setTimeout(() => {
+				  		i.parentElement.parentElement.querySelector("textarea").focus();
+					}, 0);
+					return true;
+		    	}
+		  		if (!(e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode >= 96 && e.keyCode <= 105 || e.keyCode === 8)){
+			    	e.preventDefault();
+			    }
+		    	const regex = /^[0-9:]+$/; // регулярное выражение
+		  		if(!regex.test(e.currentTarget.value)){ // если символы не являются цифрами или двоеточем
+				    e.currentTarget.value = e.currentTarget.value.slice(0, -1); // удаляем последний символ из значения input
+				    return false; // выходим из функции, чтобы введенный символ не отображался на экране
+		  		}
+				// добавляем двоеточие и ограничиваем количество цифр
+				if ((e.currentTarget.value.length === 2 || e.currentTarget.value.length === 5) && e.keyCode !== 8) {
+				    e.currentTarget.value += ":";
+		  		} else if (e.currentTarget.value.length > 8) {
+		    		e.currentTarget.value = e.currentTarget.value.slice(0, 8);
+		  		} else if ((e.currentTarget.value.length === 3 || e.currentTarget.value.length === 6) && e.keyCode === 8){
+		    		const inputValueArray = e.currentTarget.value.split('');
+		    		inputValueArray.splice(-1, 1);
+		    		e.currentTarget.value = inputValueArray.join('');
+		  		}
+		  		return true; // возвращаем true, чтобы введенный символ отобразился на экране
+			});
+    });
+
+	document.querySelector("#copy").addEventListener("click", e => {
+			  	let text = "";
+			  	document.querySelectorAll("tr").forEach(tr => {
+			  		text += tr.querySelector("input").value + " " + tr.querySelector("textarea").value + "\n";
+			  	});
+			  	navigator.clipboard
+		        .writeText(`${text}`)
+		        .then(() => {
+		            alert("Скопировано!");
+		        })
+		        .catch(() => {
+		            alert("НЕ СКОПИРОВАНО!");
+		        });
+	});
+
+	document.querySelectorAll("tr").forEach(i => {
+	  			i.addEventListener("change", saveForm);
+	  			});
+
+	addFirstSuggestions(textarea);
+	
+	function addFirstSuggestions(textarea) {
+	  	const suggestions = ['Заставка', 'Музыка', 'Заставка, музыка', 'Музыка, заставка', "Заставка и музыка", "Музыка и заставка", "Заставка с музыкой", "Музыка с заставкой"];
+	    suggestions.sort();
+	    const suggestionsList = document.createElement('ul');
+	    suggestionsList.id = "popups";
+	    suggestionsList.style.display = 'none';
+	    container.appendChild(suggestionsList);
+
+	    textarea.addEventListener('input', function() {
+	      const inputText = this.value.toLowerCase();
+	      suggestionsList.innerHTML = '';
+	      if (!suggestions.filter(suggestion => suggestion.toLowerCase().startsWith(inputText)).length) {
+				suggestionsList.style.display = 'none';
+			}
+		    else {
+		    	suggestionsList.style.display = 'block';
+		    	var rect = textarea.getBoundingClientRect();
+		    	//console.log(rect.top + document.body.scrollTop);
+		    	suggestionsList.style.top = rect.top + document.body.scrollTop + "px";
+		    	suggestionsList.style.left = rect.left + document.body.scrollLeft + "px";
+		    }
+	      suggestions.filter(suggestion => suggestion.toLowerCase().startsWith(inputText)).forEach(suggestion => {
+	        const li = document.createElement('li');
+	        li.innerText = suggestion;
+
+	        li.addEventListener('click', function() {
+	          textarea.value = this.innerText;
+	          suggestionsList.style.display = 'none';
+	          textarea.focus();
+	        });
+	        suggestionsList.appendChild(li);
+	        document.addEventListener('click', (e) => {
+				if (!textarea.contains(e.target)) {
+				    suggestionsList.style.display = 'none';
+				  	}
+				});
+	        if (!suggestion.toLowerCase().startsWith(inputText)) suggestionsList.style.display = 'none';
+		    else {
+		    	suggestionsList.style.display = 'block';
+		    	var rect = textarea.getBoundingClientRect();
+		    	console.log(rect.top + document.body.scrollTop);
+		    	suggestionsList.style.top = rect.top + document.body.scrollTop + "px";
+		    	suggestionsList.style.left = rect.left + document.body.scrollLeft + "px";
+		    }
+	      });
+	    });
+	    container.appendChild(suggestionsList);
+	  };
+	function addSuggestions(newTextarea) {
+	    const suggestions = ['Время сознания: ', 'Время сознания с Сергеем Лейбградом', 'Время сознания: стихотворение', 'Время сознания: про', 'Исторический РЗВРТ: ', 'Новости России ', 'Новости Самары ', "Новости Украины ", "Новости мира ", "Новость Омска", "Новость из Омска", "Одна новость из Омска", 'Начало', "Прощание и ", "Прощание и песня", "Песня", "Прощание", "Чат: ", "Донаты", "Поддержка канала", "Поддержка канала, донаты", "Уголок пропагандиста: ", "Исторический РЗВРТ: Игорь Сажин о", '«Время сознания»:', "«Время сознания» с Сергеем Лейбградом", '«Время сознания»: стихотворение', '«Время сознания»: про ', "Чат: про ", "Еще про ", "Ещё про", "Подводка к разговору с ", "Разговор с", "Новости, которые мы заслужили", "План эфира", "Начало, план эфира", "Начало, план эфира, геоперекличка", "Геоперекличка", "Урок географии", "География слушателей", "География РЗВРТ", 'Новости России: ', 'Новости Самары: ', "Новости Украины: ", "Новости мира: "];
+	    suggestions.sort();
+	    const suggestionsList = document.createElement('ul');
+	    suggestionsList.id = "popups";
+	    suggestionsList.style.display = 'none';
+	    container.appendChild(suggestionsList);
+
+	    newTextarea.addEventListener('input', function(e) {
+		    const inputText = this.value.toLowerCase();
+		    suggestionsList.innerHTML = '';
+		    if (!suggestions.filter(suggestion => suggestion.toLowerCase().startsWith(inputText)).length) {
+				suggestionsList.style.display = 'none';
+			}
+		    else {
+		    	suggestionsList.style.display = 'block';
+		    	var rect = e.currentTarget.getBoundingClientRect();
+		    	//console.log(rect.top + document.body.scrollTop);
+		    	suggestionsList.style.top = rect.top + document.body.scrollTop + "px";
+		    	suggestionsList.style.left = rect.left + document.body.scrollLeft + "px";
+		    }
+		    suggestions.filter(suggestion => suggestion.toLowerCase().startsWith(inputText)).forEach(suggestion => {
+		        const li = document.createElement('li');
+		        li.innerText = suggestion + " ";
+
+		        li.addEventListener('click', function() {
+		          	newTextarea.value = this.innerText + " ";
+		          	newTextarea.focus();
+		          	suggestionsList.style.display = 'none';
+		        });
+		        suggestionsList.appendChild(li);
+				document.addEventListener('click', (e) => {
+				  if (!newTextarea.contains(e.target)) {
+				    suggestionsList.style.display = 'none';
+				  }
+				});
+		    });
+	    });
+	    container.appendChild(suggestionsList);
+	  };
+	function autoGrowTextarea(textarea) {
+	    textarea.style.height = "5px";
+	    textarea.style.height = (textarea.scrollHeight) + "px";
+	  }
+	function deleteRow(e){
+	  	e.currentTarget.parentElement.parentElement.remove();
+	  }
+	function addNewRow() {
+	    const row = document.createElement("tr");
+	    row.innerHTML = `
+	      <td>
+	        <input type="tel" id="timecode${rowNum}" name="timecode${rowNum}" maxlength="8">
+	      </td>
+	      <td>
+	        <textarea id="text${rowNum}" name="text${rowNum}" rows="1" oninput="autoGrowTextarea(this)" maxlength="100"></textarea>
+	      </td>
+	      <td><button class = "delete"><img src="{% static 'delete.png' %}" width="50px" height="50px"></button></td>
+	    `;
+
+	    const newRowInput = row.querySelector("input");
+
+	    setTimeout(() => {
+		  newRowInput.focus();
+		}, 0);
+	    const newTextarea = row.querySelector("textarea");
+	    row.querySelector(".delete").addEventListener("click", deleteRow);
+	    row.querySelector(".delete").addEventListener("click", saveForm);
+	    newRowInput.addEventListener("keydown", e => {
+	    	if(e.currentTarget.value.length == 8 || e.key === "Enter" || e.key === "Tab") {
+		  		e.currentTarget.value += "";
+		    	setTimeout(() => {
+			  		newTextarea.focus();
+				}, 0);
+				return true;
+	    	}
+		    if (!(e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode >= 96 && e.keyCode <= 105 || e.keyCode === 8)){
+		    	e.preventDefault();
+		    }
+	    	const regex = /^[0-9:]+$/; // регулярное выражение
+	  		if(!regex.test(e.currentTarget.value)){ // если символы не являются цифрами или двоеточем
+			    e.currentTarget.value = e.currentTarget.value.slice(0, -1); // удаляем последний символ из значения input
+			    return false; // выходим из функции, чтобы введенный символ не отображался на экране
+	  		}
+			// добавляем двоеточие и ограничиваем количество цифр
+			if ((e.currentTarget.value.length === 2 || e.currentTarget.value.length === 5) && e.keyCode !== 8) {
+			    e.currentTarget.value += ":";
+	  		} else if (e.currentTarget.value.length > 8) {
+	    		e.currentTarget.value = e.currentTarget.value.slice(0, 8);
+	  		} else if ((e.currentTarget.value.length === 3 || e.currentTarget.value.length === 6) && e.keyCode === 8){
+	    		const inputValueArray = e.currentTarget.value.split('');
+	    		inputValueArray.splice(-1, 1);
+	    		e.currentTarget.value = inputValueArray.join('');
+	  		}
+	  		return true; // возвращаем true, чтобы введенный символ отобразился на экране
+		}); 
+	    addSuggestions(newTextarea);
+	    container.appendChild(row);
+
+	    newTextarea.addEventListener("input", function() {
+	      let value = this.value;
+	      if (value.length > 0) {
+	        this.value = value.charAt(0).toUpperCase() + value.slice(1);
+	      }
+	    });
+	    row.addEventListener("change", saveForm);
+	    //newRowInput.addEventListener("change", saveForm);
+	    //newTextarea.addEventListener("change", saveForm);
+	    }
+	rowNum++;  	
+	function saveForm(event) {
+			  event.preventDefault(); // Prevent page reload
+			  
+			  let form = document.querySelector('form');
+			  
+			  let timestamps = [];
+		 	  let texts = [];
+
+		 	  document.querySelectorAll("tr").forEach(tr => {
+			        let timestampInput = tr.querySelector("input");
+			        let textAreaInput = tr.querySelector("textarea");
+			        
+			        let timestamp = timestampInput.value;
+			        let text = textAreaInput.value;
+			        
+			        timestamps.push(timestamp);
+			        texts.push(text);
+			    });
+			    document.querySelector("#timestamps-field").value = timestamps.join("\n");
+			    document.querySelector("#texts-field").value = texts.join("\n");
+
+			     let formData = new FormData(form);
+				  formData.set('timestamps_field', timestamps.join("\n"));
+				  formData.set('texts_field', texts.join("\n"));
+
+			  fetch(form.action, {
+			    method: form.method,
+			    body: formData
+			  })
+			  .then(response => {
+			    if (response.ok) {
+			      // Handle successful response
+			      console.log("Form submitted successfully!");
+			      // You can perform any additional actions here, such as updating the UI or displaying a success message
+			    } else {
+			      // Handle error response
+			      console.error("Form submission failed!");
+			    }
+			  })
+			  .catch(error => {
+			    // Handle network or other errors
+			    console.error("An error occurred while submitting the form:", error);
+			  });
+			}
+	</script>
+</body>
+</html>
