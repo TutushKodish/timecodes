@@ -24,7 +24,11 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', timecodesViews.home, name="home"),
+    path('login/', timecodesViews.loginaccount, name='loginaccount'),
+    path('logout/', timecodesViews.logoutaccount, name='logoutaccount'),
     path('coding/', include('timecodes.urls')),
+    path('', include('timecodes.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

@@ -1,0 +1,6 @@
+{% for result in results %}
+    <a href="{% url 'td' category=result.category pageId=result.pageId %}" target="_blank"><p>{{ result.line }} ({{result.title}})</p></a>
+    <div class="separator"></div>
+{% empty %}
+    <p>No results found.</p>
+{% endfor %}

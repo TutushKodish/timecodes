@@ -8,3 +8,4 @@ class DocumentForm(forms.ModelForm):
         widgets = {
             'codes': forms.Textarea(),
         }
+
